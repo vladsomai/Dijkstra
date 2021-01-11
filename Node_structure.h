@@ -25,6 +25,8 @@ namespace structure_graf
 
 		void clearNextList();
 		void setNextList(list < shared_ptr<arc>>&);
+		list<shared_ptr<arc>> DeleteNodeInList(shared_ptr<Node>& deleteNode, list < shared_ptr<arc>>& li);
+
 
 		//constructor pentru Node - initializam cheia la 0
 		Node()
@@ -135,5 +137,32 @@ namespace structure_graf
 
 	}
 
+
+
+
+
+	//functie de stergere nod parametru dintr-o lista parametru
+	list<shared_ptr<arc>> Node::DeleteNodeInList(shared_ptr<Node>& deleteNode, list < shared_ptr<arc>>& li)
+	{
+
+		//folosim un obiect de tipul std::list<>::iterator pentru iteratie in lista parametru
+		for (auto iterator = li.begin(); iterator != li.end(); ++iterator)
+		{
+
+			//daca nodul pe care dorim sa il stergem este cel la care am ajuns in iteratie apelam functia de erase
+			if (iterator->get()->getNextNode() == deleteNode)
+			{
+
+				cout << iterator->get()->getNextNode()->getData() << " will be erased" << endl;
+				li.erase(iterator);
+				return li;
+
+			}
+
+		}
+
+		return li;
+
+	}
 
 }

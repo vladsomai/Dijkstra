@@ -23,7 +23,7 @@ int main()
 	structure_grafExample->InsertArcParam(true, 2, 5, 4);
 	structure_grafExample->InsertArcParam(true, 2, 9, 6);
 	structure_grafExample->InsertArcParam(true, 5, 6, 9);
-	structure_grafExample->InsertArcParam(true, 10, 9, 4);
+	structure_grafExample->InsertArcParam(true, 10, 9, 3);
 	structure_grafExample->InsertArcParam(true, 9, 6, 3);
 	structure_grafExample->InsertArcParam(true, 9, 13, 2);
 	structure_grafExample->InsertArcParam(true, 6, 7, 5);
@@ -49,7 +49,7 @@ void menu(shared_ptr<structure_graf::Graf> graf)
 			system("cls");
 			cout << "\n\n======MENU======\n";
 
-			cout << "1.Prim" << endl;
+			cout << "1.Dijkstra" << endl;
 			cout << "2.Afisare noduri graf.\n";
 			cout << "3.Afisare structura.\n";
 
