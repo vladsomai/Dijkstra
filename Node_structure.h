@@ -153,7 +153,7 @@ namespace structure_graf
 			if (iterator->get()->getNextNode() == deleteNode)
 			{
 
-				cout << iterator->get()->getNextNode()->getData() << " will be erased" << endl;
+				//cout << iterator->get()->getNextNode()->getData() << " will be erased because it was visited already." << endl;
 				li.erase(iterator);
 				return li;
 

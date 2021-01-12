@@ -113,7 +113,10 @@ namespace structure_graf
 		shared_ptr<arc> returnArc = nullptr;
 
 
-
+		if (listOfArches.size() == 0)
+		{
+			return nullptr;
+		}
 		for (auto it = listOfArches.begin(); it != listOfArches.end(); it++)
 		{
 
@@ -612,39 +615,55 @@ namespace structure_graf
 
 
 
-
+	/*
+	* Implementam algoritmul lui dijkstra pentru a gasi cel mai mic path de la un nod catre fiecare nod din graf.
+	* prima faza a algoritmului consta din crearea unei liste <listOfPaths> care va contine path-ul minim de la un nod la altul, populam aceasta lista cu nodul sursa, target si weight(path minim gasit)
+	* in cazul in care exista un weight de la sursa la target populam weight-ul in listOfPaths cu acel weight, altfel il populam cu SIZE_MAX(imitam infinit).
+	* dupa ce am terminat faza unu vom avea listOfPaths populata cu nodul sursa si path catre fiecare nod din graf.
+	* 
+	* Faza 2 consta in iterarea catre cel mai mic nod vecin, nevizitat
+	* retinem path-ul parcurs in "weightToActual" pe care il vom folosi pentru a calcula path-ul pana unde am ajuns la nodurile vecine nevizitate.
+	*
+	*/
 	void structure_graf::Graf::Dijkstra()
 	{
-
+		list < shared_ptr<Node> > DijkstraList = this->NoduriGraf;
 		list<shared_ptr<arc>> listOfArchesSource;//lista care va retine nodurile legate la un nod
 		list<shared_ptr<arc>> listOfArchesTarget;//lista care va retine nodurile legate la un nod
 		list<shared_ptr<currentLowestPath>> listOfPaths;//lista care va retine cele mai mici legaturi intre noduri
 		
 
-
 		shared_ptr<arc> smallestArc = nullptr;
-		size_t currentWeight=0;
-		size_t currentSmallestWeight=SIZE_MAX;//initializam cel mai mic weight cu cel mai mare numar pe care il putem aloca  
+		size_t currentWeight = 0;
+		size_t currentSmallestWeight = SIZE_MAX;//initializam cel mai mic weight cu cel mai mare numar pe care il putem aloca  
 		const size_t maximumWeight = SIZE_MAX;
 		size_t counter = 0;
 
-		queue<shared_ptr<Node>> que;//vom folosi un queue pentru a gasi nodurile care au cel mai mic arc intre ele si vom pastra in acest queue doar cele doua noduri cu arc-ul cel mai mic la acel moment
-		shared_ptr<Node> source=nullptr, target = nullptr;
+		shared_ptr<Node> source = nullptr, target = nullptr;
+		
 					
 		//calculam distanta de la fiecare nod la fiecare nod din graf
-		for (auto eachGrafNode = NoduriGraf.begin(); eachGrafNode != NoduriGraf.end(); eachGrafNode++)
+		for (auto eachGrafNode = DijkstraList.begin(); eachGrafNode != DijkstraList.end(); eachGrafNode++)
 		{
 
+			cout << "\n\n\nA new item will be applied by DIJKSTRA:\n";
+
+			smallestArc = nullptr;
+			currentWeight = 0;
+			currentSmallestWeight = SIZE_MAX;
+			counter = 0;
+			source = nullptr, target = nullptr;
+
+		
 			NodesSearchedInGraf.clear();//stergem lista parcursa
 			listOfPaths.clear();
 
 			source = *eachGrafNode;//source
 			smallestArc = smallestPathFromNode(source);
 
-			//cout << smallestArc->getNextNode()->getData() << "   " << smallestArc->getNextWeight() << endl;
 
 			//iteram in lista de noduri ale grafului pentru a gasi un arc cu weightul cel mai mic
-			for (auto actualNode = NoduriGraf.begin(); actualNode != NoduriGraf.end(); actualNode++)
+			for (auto actualNode = DijkstraList.begin(); actualNode != DijkstraList.end(); actualNode++)
 			{
 
 				counter = 0;
@@ -654,129 +673,113 @@ namespace structure_graf
 
 				if (*eachGrafNode != *actualNode)
 				{
+
 					target = *actualNode;
-				}
-				else continue;
 
+					shared_ptr<currentLowestPath> newPath = make_shared<currentLowestPath>();
+					listOfPaths.push_back(newPath);//introducem tipul de date in lista
 
+					newPath->setSource(source);
+					newPath->setTarget(target);
 
-
-				//iteram in lista de noduri ale actualNode pentru a verifica care weight este cel mai mic,
-				//in momentul in care gasim un weight mai mic decat "currentSmallestWeight", vom seta "currentSmallestWeight" cu actualWeight
-				for (auto actualArch = listOfArchesTarget.begin(); actualArch != listOfArchesTarget.end(); actualArch++)
-				{
-
-
-					//avem path catre source
-					if (actualArch->get()->getNextNode() == source)
+					//iteram in lista de noduri ale actualNode pentru a verifica care weight este cel mai mic,
+					//in momentul in care gasim un weight mai mic decat "currentSmallestWeight", vom seta "currentSmallestWeight" cu actualWeight
+					for (auto actualArch = listOfArchesTarget.begin(); actualArch != listOfArchesTarget.end(); actualArch++)
 					{
 
-						currentWeight = actualArch->get()->getNextWeight();//avem un weight valabil
+						//cout << source->getData() << " - " << target->getData() << endl;
 
-						shared_ptr<currentLowestPath> newPath = make_shared<currentLowestPath>();
-						listOfPaths.push_back(newPath);//introducem tipul de date in lista
+					    //cout << actualArch->get()->getNextNode()->getData() << ",\t";
 
+						//avem path catre source
+						if (actualArch->get()->getNextNode() == source)
+						{
 
-						//retinem ca de la source la target avem path-ul current weight
-						newPath->setSource(source);
-						newPath->setTarget(target);
-						newPath->setWeight(currentWeight);
+							currentWeight = actualArch->get()->getNextWeight();//avem un weight valabil
 
-						//cout << source->getData() << "  ---  " << newPath->getWeight() << "  ---  " << target->getData() << endl;
+							//retinem ca de la source la target avem path-ul current weight
+							newPath->setSource(source);
+							newPath->setTarget(target);
+							newPath->setWeight(currentWeight);
 
-						break;
-					}
-					else
-					{
-
-						if (counter != 0) break; //daca nodul are deja adaugat path-ul trecem la urmatorul nod
-
-
-						shared_ptr<currentLowestPath> newPath = make_shared<currentLowestPath>();
-						listOfPaths.push_back(newPath);//introducem tipul de date in lista
-
-
-						//adaugam cele doua noduri in lista si le punem weight-ul SIZE_MAX
-						newPath->setSource(source);
-						newPath->setTarget(target);
-						//cout << source->getData() << "  ---  " << newPath->getWeight() << "  ---  " << target->getData() << endl;
-
-						counter++;
+						}
 
 					}
 
-				}
 
+				}
 		
 			}
 
-		
 			NodesSearchedInGraf.push_back(source);//introducem primul numar vizitat in nodes searched in graf 
 
-						//print list of paths to source
+			////print list of paths to source
 			for (auto it = listOfPaths.begin(); it != listOfPaths.end(); it++)
 			{
 				cout << it->get()->getSource()->getData() << " ---- " << it->get()->getWeight() << " ---- ";
 				cout << it->get()->getTarget()->getData() << endl;
-
-
+			
+			
 			}
 
-			//---------
-			source = smallestArc->getNextNode();//intram in nodul cu path-ul cel mai mic
-			size_t totalWeight = 0;
-			size_t acumulatedWeight = 0;
+			cout << "\nPHASE 1 FINISHED...\n\n";
 
-			for (int i = 0; i < 4; i++)
+
+			source = smallestArc->getNextNode();//intram in nodul cu path-ul cel mai mic
+			size_t weightToActual = smallestArc->getNextWeight();
+
+			while (NoduriGraf.size() != NodesSearchedInGraf.size())
 			{
-				cout << "the new source will become the smallest: " << source->getData() << endl;
+			
+		    	size_t acumulatedWeight = 0;
+				size_t tempWeight{};
+
+	
 
 				listOfArchesSource = source->getNextArc();//lista de noduri catre care avem arc
+				smallestArc = smallestPathFromNode(source);//cel mai mic arc din nodul sursa
 
-				smallestArc = smallestPathFromNode(source);
-				//acumulatedWeight += smallestArc->getNextWeight();
-
+				//cout << "The smallest will become the new source: " << source->getData() << endl;
 
 				//iteram in lista de noduri ale actualNode pentru a verifica care weight este cel mai mic,
 				//in momentul in care gasim un weight mai mic decat "currentSmallestWeight", vom seta "currentSmallestWeight" cu actualWeight
 				for (auto actualArch = listOfArchesSource.begin(); actualArch != listOfArchesSource.end(); actualArch++)
 				{
+
 					shared_ptr<Node> actualNode = actualArch->get()->getNextNode();
-					
+
 					//nodul nu trebuie sa fie in nodurile vizitate deja
 					if (!NodeExistsInNodesSearchedInGraf(actualNode))
 					{
 						
-
 						for (auto it = listOfPaths.begin(); it != listOfPaths.end(); it++)
 						{
 
-							if (it->get()->getTarget() == source)
-							{
-
-								//acumulatedWeight += 
-
-							}
-
 							if (it->get()->getTarget() == actualNode)
 							{
+								
+								//cout << it->get()->getSource()->getData() << '\t';
+								//cout << it->get()->getWeight() << '\t';
+								//cout << it->get()->getTarget()->getData() << "\t\n";
 
-								//it->get()->getSource() ----este 2
-								//it->get()->getWeight() ----este 2
-							    //it->get()->getTarget() ----este 9
-
-								return;
- 								acumulatedWeight = it->get()->getWeight();
-							    //totalWeight = smallestArc->getNextWeight() + actualArch->get()->getNextWeight()+ acumulatedWeight;
-								cout << "TOTAL WEIGHT from " << source->getData() <<" to "<<actualArch->get()->getNextNode()->getData()<< " is " << acumulatedWeight << endl;
-								cout << "because " << smallestArc->getNextWeight() << " + " << actualArch->get()->getNextWeight() << endl;
+								//weight acumulat trebuie sa fie egal cu cel mai mic path al lui source + patth la actualNode
+					
+								acumulatedWeight = weightToActual + actualArch->get()->getNextWeight();
+								//cout << "Total weight from " << it->get()->getSource()->getData() << " to " << it->get()->getTarget()->getData() << " is " << acumulatedWeight << endl;
+								//cout << "because " << weightToActual << " + " << actualArch->get()->getNextWeight() << " = " << acumulatedWeight << endl;
 
 								if (acumulatedWeight < it->get()->getWeight())
 								{ 
 								
-									cout << "we are setting the distance from " << it->get()->getSource()->getData() << " to " << it->get()->getTarget()->getData()<<" with "<< acumulatedWeight << endl;
+								//	cout << "We are setting the distance from " << it->get()->getSource()->getData() << " to " << it->get()->getTarget()->getData()<<" with "<< acumulatedWeight <<"\n\n";
 									it->get()->setWeight(acumulatedWeight);//setam noul weight in lista
-								
+									
+								}
+								else
+								{
+
+									//cout << "No changes were made for the above items" <<"\n\n";
+							
 								}
 				
 
@@ -786,63 +789,81 @@ namespace structure_graf
 
 					}
 				}
-				
+
 				
 				//vom crea un nod temporar a carei lista de next nu va contine nodurile vizitate
 				shared_ptr<Node> temp = make_shared<Node>();
-				temp = source;
+				
+				temp->setData(source->getData());
+				temp->setNextList(listOfArchesSource);
+
 				auto listOfArchestemp = temp->getNextArc();//retine nodurile de next intr-o variabila
 			
 				//pentru fiecare nod care a fost vizitat vom sterge acel link pentru a nu vizita inca odata
 				for (auto it : NodesSearchedInGraf)
 				{
-					cout << it->getData() << " is already visited, we will delete it from " << temp->getData() << endl;
+
 					listOfArchestemp = temp->DeleteNodeInList(it, listOfArchestemp);
+				
 				}
+
 				temp->setNextList(listOfArchestemp);//setam lista modificata in nodul nou
 
 				smallestArc = smallestPathFromNode(temp);//cel mai mic nod nevizitat al nodului la care suntem in iteratie
 
-				cout <<"smallest node from "<<source->getData()<<" is " << smallestArc->getNextNode()->getData() << "\n";
-
-				NodesSearchedInGraf.push_back(source);
-				source = smallestArc->getNextNode();
-
-				for (auto it = listOfPaths.begin(); it != listOfPaths.end(); it++)
+				if (smallestArc == nullptr)
 				{
-					cout << it->get()->getSource()->getData() << " ---- " << it->get()->getWeight() << " ---- ";
-					cout << it->get()->getTarget()->getData() << endl;
+
+					NodesSearchedInGraf.push_back(source);
+
+					cout << "All nodes were visited for " << eachGrafNode->get()->getData() << ".\n\n\n\n\n====================DIJKSTRA RETURNED THE FOLLOWING=========================\n";
+					cout << "\nS ---- W ---- T\n" << endl;
+					break;
+
+				}
+				else
+				{
+
+					cout << "Smallest node from " << source->getData() << " is " << smallestArc->getNextNode()->getData() << "\n";
+
+					NodesSearchedInGraf.push_back(source);
+					source = smallestArc->getNextNode();
+					weightToActual += smallestArc->getNextWeight();
+
+
+					for (auto it = listOfPaths.begin(); it != listOfPaths.end(); it++)
+					{
+						cout << it->get()->getSource()->getData() << " ---- " << it->get()->getWeight() << " ---- ";
+						cout << it->get()->getTarget()->getData() << endl;
+
+
+					}
+
 
 
 				}
-				cout << "\n\n\n";
 
 			}
-
-			//--------------
-
-
-
-
-
-
-
-
 
 			//print list of paths to source
 			for (auto it = listOfPaths.begin(); it != listOfPaths.end(); it++)
 			{
+
 				cout << it->get()->getSource()->getData() << " ---- " << it->get()->getWeight() << " ---- ";
 				cout << it->get()->getTarget()->getData() << endl;
 
-
 			}
-			break;
+
+			cout << "Visited nodes:\n";
+			PrintNodesSearchedInGraf();
+			cout << endl;
+			system("pause");
+
+
+
 		}
 
 		cout << endl;
-
-
 
 	}
 
