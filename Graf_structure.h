@@ -30,19 +30,14 @@ namespace structure_graf
 		auto getFirstNode() { return this->NoduriGraf.begin(); }
 		//------------------------------------------------------------
 		
-		//constructor - initializare obiect graf - InitGraf()
 		Graf()
 		{
-
-			//cream lista fara noduri
 			NoduriGraf.clear();
 			NodesSearchedInGraf.clear();
-		
 		}
 
 		~Graf() = default;
 	};
-
 
 	//cream un tip de date care va contine nodul sursa, nodul target si cel mai mic path care leaga aceste noduri
 	class currentLowestPath
