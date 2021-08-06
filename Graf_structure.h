@@ -1,7 +1,6 @@
 #include"Node_structure.h"
 #include <queue>
 
-
 namespace structure_graf
 {
 	class currentLowestPath;
@@ -18,14 +17,14 @@ namespace structure_graf
 		void InsertNodeParam(int);
 		void InsertArcParam(bool, int, int, size_t);
 		void Dijkstra();
-		bool NodeExistsInNodesSearchedInGraf(shared_ptr<Node>&);
-		bool NodeExistsInList(shared_ptr<Node>&, list < shared_ptr<Node>>&);
+		bool NodeExistsInNodesSearchedInGraf(shared_ptr<Node>);
+		bool NodeExistsInList(shared_ptr<Node>, list < shared_ptr<Node>>&);
 		void PrintStructure();
 		void afisareNoduriGraf();
 		void PrintNodesSearchedInGraf();
 		void PrintQueue(queue <shared_ptr<Node>>&);
 		size_t sizeof_NoduriGraf() { return NoduriGraf.size(); }
-		shared_ptr<arc> smallestPathFromNode(shared_ptr<Node>&);
+		shared_ptr<arc> smallestPathFromNode(shared_ptr<Node>);
 		void clearSearchedList() { NodesSearchedInGraf.clear(); }
 		auto getFirstNode() { return this->NoduriGraf.begin(); }
 		//------------------------------------------------------------
@@ -65,6 +64,10 @@ namespace structure_graf
 
 		}
 	};
+
+
+
+
 	void currentLowestPath::setSource(shared_ptr<Node>& sourceParam) { this->source = sourceParam; }
 	void currentLowestPath::setTarget(shared_ptr<Node>& targetParam) { this->target = targetParam; }
 	void currentLowestPath::setWeight(size_t weightParam) { this->weight = weightParam; }
@@ -73,7 +76,7 @@ namespace structure_graf
 	shared_ptr<Node> currentLowestPath::getTarget() { return this->target; }
 	size_t currentLowestPath::getWeight() { return this->weight; }
 
-	shared_ptr<arc> structure_graf::Graf::smallestPathFromNode(shared_ptr<Node>& inputNode)
+	shared_ptr<arc> structure_graf::Graf::smallestPathFromNode(shared_ptr<Node> inputNode)
 	{
 		size_t currentWeight = 0;
 		size_t currentSmallestWeight = SIZE_MAX;
@@ -277,7 +280,7 @@ namespace structure_graf
 	}
 
 	//verificam daca un nod exista in lista rezultata din cautarea nodurilor 
-	bool  structure_graf::Graf::NodeExistsInNodesSearchedInGraf(shared_ptr<Node>& actual)
+	bool  structure_graf::Graf::NodeExistsInNodesSearchedInGraf(shared_ptr<Node> actual)
 	{
 		for (auto iterator = this->NodesSearchedInGraf.begin(); iterator != this->NodesSearchedInGraf.end(); ++iterator)
 		{
@@ -290,7 +293,7 @@ namespace structure_graf
 	}
 
 	//verificam daca un nod exista in lista
-	bool  structure_graf::Graf::NodeExistsInList(shared_ptr<Node>& actual , list<shared_ptr<Node>>& li)
+	bool  structure_graf::Graf::NodeExistsInList(shared_ptr<Node> actual , list<shared_ptr<Node>>& li)
 	{
 		for (auto iterator = li.begin(); iterator != li.end(); ++iterator)
 		{
