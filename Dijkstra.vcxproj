@@ -139,9 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="app10_structure.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Arc.cpp" />
+    <ClCompile Include="CurrentLowestPath.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Graf_structure.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arc.h" />
+    <ClInclude Include="CurrentLowestPath.h" />
     <ClInclude Include="Graf_structure.h" />
     <ClInclude Include="Node_structure.h" />
   </ItemGroup>
